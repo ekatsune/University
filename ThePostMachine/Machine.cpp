@@ -1,71 +1,167 @@
+#include <istream>
 #include "Machine.hpp"
 #include "Tape.hpp"
 #include "Rule.hpp"
 #include <map>
+#include <sstream>
+#include <limits>
 #include <iostream>
 using namespace std;
 
-// конструктор: начинаем с первой инструкции
-Machine::Machine() : currentRule(0) {}
+Machine::Machine() : currentRule(1) {}
 
-// ================= ЗАГРУЗКА =================
+void Machine::parseConditionalRule(int ruleNumber, Rule::Ruls action,
+                                   std::istringstream& ss, const std::string& line) {
+    int condition, nextIfZero, nextIfOne;
 
-// загрузка программы из потока (например, из файла или cin)
-void Machine::loadProgram(std::istream& in) {
+    if (!(ss >> condition >> nextIfZero >> nextIfOne)) {
+        std::cerr << " Ошибка: некорректный формат условного правила:\n"
+                  << "   " << line << "\n";
+        return;
+    }
+
+    rules[ruleNumber] = Rule(ruleNumber, action, condition, nextIfZero, nextIfOne);
+}
+
+void Machine::parseRuleLine(const std::string& line) {
+    std::istringstream ss(line);
+
+    int ruleNumber, actionInt;
+    if (!(ss >> ruleNumber >> actionInt)) {
+        std::cerr << "Ошибка: пропущен номер или действие в строке: " << line << "\n";
+        return;
+    }
+
+    Rule::Ruls action = static_cast<Rule::Ruls>(actionInt);
+
+    if (action == Rule::moveIf)
+        parseConditionalRule(ruleNumber, action, ss, line);
+    else
+        parseSimpleRule(ruleNumber, action, ss, line);
+}
+
+void Machine::parseSimpleRule(int ruleNumber, Rule::Ruls action,
+                              std::istringstream& ss, const std::string& line) {
+    int nextRule;
+
+    if (!(ss >> nextRule)) {
+        ss.clear();
+        ss.seekg(0);
+        int tmpAction;
+        ss >> ruleNumber >> tmpAction >> nextRule;
+    }
+
+    rules[ruleNumber] = Rule(ruleNumber, action, nextRule);
+}
+
+void Machine::LoadProgram(std::istream& in) {
     rules.clear();
+    std::string line;
 
-    int ruleNumber, action, condition, nextRule;
-    while (in >> ruleNumber >> action >> condition >> nextRule) {
-        // action - это enum Rule::Ruls (по числу)
-        rules[ruleNumber] = Rule(ruleNumber,
-                                 static_cast<Rule::Ruls>(action),
-                                 condition,
-                                 nextRule);
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+        if (line.find_first_not_of("01") == std::string::npos) {
+            std::istringstream tapeStream(line);
+            tapeStream >> tape;
+            break;
+        }
+        parseRuleLine(line);
     }
+
+    in.clear();
+    std::cout << "Программа успешно загружена (" << rules.size() << " правил).\n";
 }
 
-// загрузка ленты из потока (например, строка 01001)
-void Machine::loadTape(std::istream& in) {
+void Machine::LoadTape(std::istream& in) {
+    in >> tape;
+}
+
+void Machine::InputTapeFromConsole() {
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "\nВведите начальное состояние ленты (например, 00000): ";
+
+    string tapeStr;
+    getline(cin, tapeStr);
+
+    // Если пользователь случайно оставил строку пустой
+    if (tapeStr.empty()) {
+        cout << "Пустая лента! Установлено значение по умолчанию: 00000\n";
+        tapeStr = "00000";
+    }
+    istringstream ss(tapeStr);
+    LoadTape(ss);
+
+    cout << "Лента успешно загружена: " << tapeStr << "\n";
+}
+
+
+void Machine::InputProgramFromConsole() {
+    rules.clear();
     string line;
-    in >> line;
+    while (true) {
+        cout << "Правило #" << rules.size() + 1 << ": ";
+        getline(cin, line);
 
-    // лента начинается с позиции 0
-    for (char symbol : line) {
-        if (symbol == '1') tape.WriteOne();
-        else tape.WriteZero();
-        tape.MoveRight();
-    }
+        if (line.empty())
+            break;
 
-    // вернуть каретку в начало
-    for (size_t i = 0; i < line.size(); ++i) {
-        tape.MoveLeft();
+        istringstream ss(line);
+        int ruleNumber, actionInt;
+        ss >> ruleNumber >> actionInt;
+
+        Rule::Ruls action = static_cast<Rule::Ruls>(actionInt);
+
+        if (action == Rule::moveIf) {
+            int condition, nextIfZero, nextIfOne;
+            if (!(ss >> condition >> nextIfZero >> nextIfOne)) {
+                cout << "Ошибка: для moveIf нужно 5 чисел: ruleNumber action condition nextIfZero nextIfOne\n";
+                continue;
+            }
+            rules[ruleNumber] = Rule(ruleNumber, action, condition, nextIfZero, nextIfOne);
+        } else {
+            int nextRule;
+            if (!(ss >> nextRule)) {
+                cout << "Ошибка: для обычных правил нужно 3 числа: ruleNumber action nextRule\n";
+                continue;
+            }
+            rules[ruleNumber] = Rule(ruleNumber, action, nextRule);
+        }
     }
+    cout << "\nПрограмма успешно загружена (" << rules.size() << " правил).\n";
 }
 
-// ================= УПРАВЛЕНИЕ ПРАВИЛАМИ =================
+int Machine::GetCurrentRule() const {
+    return currentRule;
+}
 
-// добавить правило вручную
-void Machine::addRule(Rule rule) {
+void Machine::AddRule(const Rule& rule) {
     rules[rule.GetRuleNumber()] = rule;
 }
 
-// удалить правило по ruleNumber
-void Machine::removeRule(int ruleNumber) {
-    rules.erase(ruleNumber);
+void Machine::RemoveRule(int ruleNumber) {
+    auto it = rules.find(ruleNumber);
+    if (it != rules.end()) {
+        for (auto& [num, rule] : rules) {
+            if (rule.GetNextRule() == ruleNumber) {
+                cout << "Внимание: правило #" << num
+                     << " ссылается на удаляемое правило #" << ruleNumber << "\n";
+            }
+        }
+        rules.erase(it);
+        cout << "Правило #" << ruleNumber << " удалено.\n";
+    } else {
+        cout << "Правило #" << ruleNumber << " не найдено!\n";
+    }
 }
 
-// вывести все правила
-void Machine::showRules() {
+void Machine::ShowRules() {
     for (auto& [num, rule] : rules) {
-        cout << "Rule " << num << ": ";
         rule.Show();
     }
 }
 
-// ================= ВЫПОЛНЕНИЕ =================
-
-// сделать один шаг (одно правило)
-void Machine::step() {
+void Machine::Step() {
     if (currentRule == -1) return;
     auto it = rules.find(currentRule);
     if (it == rules.end()) {
@@ -97,32 +193,44 @@ void Machine::step() {
             currentRule = rule.GetNextRule();
             break;
 
-        case Rule::moveIf:
-            if (tape.Read() == rule.GetCondition()) {
-                currentRule = rule.GetNextRule();
-            } else {
-                auto next = rules.upper_bound(currentRule);
-                currentRule = (next == rules.end()) ? -1 : next->first;
-            }
+        case Rule::moveIf: {
+            int symbol = tape.Read();
+            if (symbol == rule.GetCondition())
+                currentRule = rule.GetNextIfZero();
+            else
+                currentRule = rule.GetNextIfOne();
+
+            std::cout << "Condition check: symbol=" << symbol
+                      << " condition=" << rule.GetCondition()
+                      << " → GOTO Rule " << currentRule << "\n";
             break;
+        }
 
         case Rule::end:
             cout << "Program terminated by END\n";
-            currentRule = -1; // признак завершения
+            currentRule = -1;
             break;
     }
 }
 
-// выполнять всю программу до конца
-void Machine::run() {
+void Machine::Run() {
+    if (currentRule == -1)
+        currentRule = 1;
     while (currentRule != -1) {
-        step();
-        showState(); // для отладки можно оставить
+        Step();
+        if (currentRule == -1) break;
+        ShowState();
     }
 }
 
-// показать текущее состояние (ленту + правило)
-void Machine::showState() {
-    cout << "Current rule: " << currentRule << endl;
+void Machine::ShowState() {
+    cout << "---------------------------------\n";
+    cout << " Current rule: " << currentRule << endl;
     tape.ShowTape();
 }
+
+void Machine::GetTapeToModify(int pos, char val) {
+    tape.ModifyTape(pos, val);
+}
+
+
