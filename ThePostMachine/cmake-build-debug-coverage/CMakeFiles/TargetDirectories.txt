@@ -1,3 +1,0 @@
-E:/Third Semestr/PPOIS_lb/laba №1/ThePostMachine/cmake-build-debug-coverage/CMakeFiles/ThePostMachine.dir
-E:/Third Semestr/PPOIS_lb/laba №1/ThePostMachine/cmake-build-debug-coverage/CMakeFiles/edit_cache.dir
-E:/Third Semestr/PPOIS_lb/laba №1/ThePostMachine/cmake-build-debug-coverage/CMakeFiles/rebuild_cache.dir
