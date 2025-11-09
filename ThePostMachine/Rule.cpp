@@ -3,12 +3,20 @@
  * @brief Реализация класса `Rule`.
  * @details
  * Этот файл содержит реализацию конструкторов и методов класса `Rule`.
- * Реализованы методы: `int GetRuleNumber()const`,`Ruls GetAction() const`,
- * `int GetCondition()const`,`int GetNextRule()const`,`int GetNextIfZero() const`,
- * `int GetNextIfOne() const`,`void Show() const`, перегрузка оператора `operator>>`,
- * а так же конструктор по умолчанию `Rule()` и два конструктора с параметрами:
- * `Rule(int ruleNumber, Ruls action, int nextRule)`,
- * `Rule(int ruleNumber, Ruls action, int condition, int nextIfZero, int nextIfOne)`.
+ * Реализованы методы:
+ * - `int GetRuleNumber()const`
+ * - `Ruls GetAction() const`
+ * - `int GetCondition()const`
+ * - `int GetNextRule()const`
+ * - `int GetNextIfZero() const`
+ * - `int GetNextIfOne() const`
+ * - `void Show() const`
+ * Также реализованы:
+ * - перегрузка оператора `operator>>`
+ * - конструктор по умолчанию `Rule()`
+ * - два конструктора с параметрами:
+ *  - `Rule(int ruleNumber, Ruls action, int nextRule)`
+ *  - `Rule(int ruleNumber, Ruls action, int condition, int nextIfZero, int nextIfOne)`
  * @author Ekatsune
  * @see Rule
  */
@@ -33,6 +41,10 @@ Rule::Rule() :
  * @brief Конструктор класса с параметрами.
  * @details
  * Создает правило, инициализируя номер правила, действие и номер следующего правила.
+ * Используется для правил, не имеющих условий (например, `WRITE`, `MOVE LEFT`, `MOVE RIGHT`).
+ * @param ruleNumber - номер текущего правила.
+ * @param action - действие, выполняемое этим правилом.
+ * @param nextRule - номер следующего правила, к которому следует перейти.
  */
 Rule::Rule(int ruleNumber, Ruls action, int nextRule)
         : ruleNumber(ruleNumber),
@@ -45,7 +57,12 @@ Rule::Rule(int ruleNumber, Ruls action, int nextRule)
 /**
  * @brief Конструктор класса с параметрами.
  * @details
- * Создает правило, инициализируя номер правила, действие, условие и два условных переходов а следующие правила.
+ * Создает правило, инициализируя номер правила, действие, условие и два возможных переходов.
+ * @param ruleNumber - номер текущего правила.
+ * @param action - действие, выполняемое этим правилом (`moveIf`).
+ * @param condition - проверяемое условие (ожидаемое значение символа под кареткой: `0` или `1`).
+ * @param nextIfZero - номер следующего правила, если условие возвращает `0`.
+ * @param nextIfOne - номер следующего правила, если условие возвращает `1`.
  */
 Rule::Rule(int ruleNumber, Ruls action, int condition, int nextIfZero, int nextIfOne)
         : ruleNumber(ruleNumber),
@@ -62,7 +79,7 @@ int Rule::GetRuleNumber() const {
     return ruleNumber;
 }
 /**@brief Геттер условия.
- * @return `condition` - условие наличия символа `0` или `1` под кореткой, которое должно быть проверено.
+ * @return `condition` - условие проверки `0` или `1` под кореткой, которое должно быть проверено.
  * */
 int Rule::GetCondition() const {
     return condition;
@@ -88,8 +105,7 @@ int Rule::GetNextIfOne() const { return nextIfOne; }
 Rule::Ruls Rule::GetAction() const {
     return action;
 }
-/**@brief Просмотр возможных действий.
- * @details
+/**@brief Просмотр деталей текущего правила.
  * */
 void Rule::Show() const {
     std::cout << "Правило " << ruleNumber << ": ";
@@ -113,22 +129,40 @@ void Rule::Show() const {
     std::cout << std::endl;
 }
 
+/**
+ * @brief Перегрузка оператора ввода `>>`.
+ * @details
+ * Позволяет считать правило из входного потока (например, из файла или консоли).
+ * Формат ввода:
+ * ```
+ * ruleNumber action [condition nextIfZero nextIfOne] | [nextRule]
+ * ```
+ * где:
+ * - если `action == moveIf`, читаются 5 чисел;
+ * - иначе читаются 3 числа.
+ *
+ * @param input Входной поток (`std::istream`).
+ * @param rule Объект `Rule`, в который будут записаны считанные данные.
+ * @return Ссылка на входной поток `input`.
+ *
+ * @see Rule::Ruls
+ */
 
-std::istream& operator>>(std::istream& in, Rule& r) {
+std::istream& operator>>(std::istream& input, Rule& rule) {
     int num, act;
-    in >> num >> act;
+    input >> num >> act;
 
     Rule::Ruls action = static_cast<Rule::Ruls>(act);
 
     if (action == Rule::moveIf) {
         int cond, j1, j2;
-        in >> cond >> j1 >> j2;
-        r = Rule(num, action, cond, j1, j2);
+        input >> cond >> j1 >> j2;
+        rule = Rule(num, action, cond, j1, j2);
     } else {
         int next;
-        in >> next;
-        r = Rule(num, action, next);
+        input >> next;
+        rule = Rule(num, action, next);
     }
 
-    return in;
+    return input;
 }

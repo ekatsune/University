@@ -18,7 +18,7 @@ public:
  /** @brief Выполняет ход игрока и обновляет игровое поле. */
  void Logic();
  /** @brief Проверяет, закончилась ли игра. */
- [[nodiscard]] bool GetGameOver() const;
+ bool GetGameOver() const;
  /** @brief Проверяет, выполнены ли условия для победы/ничьи. */
  void AreWin();
  /** @brief Получение ссылки на элемент игрового поля. */

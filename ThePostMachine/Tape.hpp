@@ -3,7 +3,6 @@
 #include <map>
 #include <vector>
 #include <istream>
-using namespace std;
 /**
  * @class Tape
  * @brief Класс реализующий работу с лентой и кареткой.
@@ -15,7 +14,7 @@ private:
     /** @brief Текущая позиция каретки. */
     int position = 0;
     /** @brief Хранение ленты. */
-    map <int,int> tape;
+    std::map <int,int> tape;
     /** @brief Геттер значения под кореткой. */
     int GetSymbol (int positionT);
     /** @brief Сеттер значения под каретку. */
@@ -38,6 +37,6 @@ public:
     /** @brief Редактирование значений на ленте. */
     void ModifyTape(int positionT, char value);
     /** @brief Перегрузка оператора ввода. */
-    friend std::istream& operator>>(std::istream& in, Tape& t);
+    friend std::istream& operator>>(std::istream& input, Tape& tape);
 };
 

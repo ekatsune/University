@@ -48,9 +48,6 @@ TEST(PlayConstructorTest, EmptyFieldInitializedWithStars) {
             EXPECT_EQ(g[i][j], '*');
 }
 
-// =============================
-// 2. Оператор []
-// =============================
 TEST(PlayOperatorTest, CanAccessAndModifyCell) {
     Play g(3);
     g[1][2] = 'X';

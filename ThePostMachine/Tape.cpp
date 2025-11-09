@@ -3,9 +3,18 @@
  * @brief Реализация класса `Tape`.
  * @details
  * Этот файл содержит реализацию конструктора и методов класса `Tape`.
- * Реализованы методы: `Tape ()`, `int Read()`, `void WriteOne()`, `void WriteZero()`, `void MoveRight()`;
- * `void MoveLeft()`, `void ShowTape()`, `void ModifyTape(int positionT, char value)`,
- * а также перегрузка оператора `operator>>`.
+ * Реализованы методы:
+ * - `Tape ()`
+ * - `Tape::GetSymbol(int positionT)`
+ * - `void SetSymbol(int positionT, int symbol)`
+ * - `int Read()`
+ * - `void WriteOne()`
+ * - `void WriteZero()`
+ * - `void MoveRight()`
+ * - `void MoveLeft()`
+ * - `void ShowTape()`
+ * - `void ModifyTape(int positionT, char value)`
+ * - перегрузка оператора `operator>>`.
  * @author Ekatsune
  * @see Tape
  */
@@ -29,6 +38,8 @@ Tape::Tape() {
  * @details
  * По переданному значению позиции в ленте `positionT` ищет и возвращает значение ленты на позиции.
  * Если такой позиции в ленте не задано, возвращает ноль (иммитация бесконечной ленты).
+ * @param positionT - позиция в ленте, с которой нужно считать символ.
+ * @return Символ (`0` или `1`) на заданной позиции.
  */
 
 int Tape::GetSymbol(int positionT) {
@@ -40,9 +51,9 @@ int Tape::GetSymbol(int positionT) {
 
 /**
  * @brief  Сеттер символа.
- * @details
- *  По переданному значению позиции в ленте `positionT` и значению ячейки ленты `symbol`
- *  ставит на указанную позицию нужный символ.
+ * @details Заменяет или добавляет значение символа в ленту `tape`.
+ * @param positionT - позиция в ленте, которую требуется изменить.
+ * @param symbol - значение ячейки (`0` или `1`).
  */
 
 void Tape::SetSymbol(int positionT, int symbol) {
@@ -51,6 +62,7 @@ void Tape::SetSymbol(int positionT, int symbol) {
 
 /**
  * @brief  Чтение текущего символа.
+ * @return Символ (`0` или `1`), находящийся под кареткой.
  */
 
 int Tape::Read() {
@@ -115,38 +127,48 @@ void Tape::ShowTape() {
 }
 
 /**
- * @brief  Перегрузка оператора 'operator>>'.
- * @details Оператор ввода перегружается таким образом, чтобы можно было вводить значения ячеек
- * ленты более понятной записью.
+ * @brief Перегрузка оператора ввода `>>`.
+ * @param input - входной поток (`std::istream`).
+ * @param tape - объект ленты, в который будут считаны данные.
+ * @return Ссылка на входной поток `input`.
+ * @details
+ * Считывает строку символов `0` и `1` и инициализирует ленту соответствующими значениями.
+ *
+ * Пример формата ввода:
+ * ```
+ * 0110101
+ * ```
  */
 
-std::istream& operator>>(std::istream& in, Tape& t) {
-    std::string s;
+std::istream& operator>>(std::istream& input, Tape& tape) {
+    std::string string;
 
-    while (std::getline(in, s)) {
-        while (!s.empty() && (s.back() == '\r' || s.back() == ' ' || s.back() == '\t'))
-            s.pop_back();
+    while (std::getline(input, string)) {
+        while (!string.empty() && (string.back() == '\r' || string.back() == ' ' || string.back() == '\t'))
+            string.pop_back();
 
-        if (!s.empty()) break;
+        if (!string.empty()) break;
     }
 
-    if (s.empty()) return in;
-    t.tape.clear();
-    t.position = 0;
+    if (string.empty()) return input;
+    tape.tape.clear();
+    tape.position = 0;
 
-    for (size_t i = 0; i < s.size(); ++i) {
-        if (s[i] == '0')
-            t.tape[(int)i] = 0;
-        else if (s[i] == '1')
-            t.tape[(int)i] = 1;
+    for (size_t i = 0; i < string.size(); ++i) {
+        if (string[i] == '0')
+            tape.tape[(int)i] = 0;
+        else if (string[i] == '1')
+            tape.tape[(int)i] = 1;
     }
 
-    return in;
+    return input;
 }
 
 /**
  * @brief Редактирование ленты.
- *  * @details
+ * @param positionT - позиция ячейки, значение которой требуется изменить.
+ * @param value - новый символ (`'0'` или `'1'`).
+ * @details
  * Изменяет символ на указанной позиции. Разрешены только символы `0` и `1`.
  * При вводе других значений выбрасывается исключение `std::invalid_argument`.
  */

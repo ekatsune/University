@@ -1,3 +1,31 @@
+/**
+ * @file Machine.cpp
+ * @brief Реализация класса `Machine`.
+ * @details
+ * Этот файл содержит реализацию конструктора и методов класса `Machine`,
+ * который моделирует работу машины Поста.
+ * Реализованы методы:
+ * - `Machine()`
+ * - `void parseRuleLine(const std::string&)`
+ * - `void parseSimpleRule(int, Rule::Ruls, std::istringstream&)`
+ * - `void parseConditionalRule(int, Rule::Ruls, std::istringstream&, const std::string&)`
+ * - `void LoadProgram(std::istream&)`
+ * - `void LoadTape(std::istream&)`
+ * - `void InputTapeFromConsole()`
+ * - `void InputProgramFromConsole()`
+ * - `int GetCurrentRule() const`
+ * - `void AddRule(const Rule&)`
+ * - `void RemoveRule(int)`
+ * - `void ShowRules()`
+ * - `void Step()`
+ * - `void Run(bool log)`
+ * - `void ShowState()`
+ * - `void GetTapeToModify(int, char)`
+ * @see Machine, Tape, Rule
+ * @author
+ * Ekatsune
+ */
+
 #include <istream>
 #include "Machine.hpp"
 #include "Tape.hpp"
@@ -8,22 +36,23 @@
 #include <iostream>
 using namespace std;
 
+/**
+ * @brief Конструктор класса `Machine`.
+ * @details
+ * Инициализирует объект машины, устанавливая текущее правило в 1 (начальное состояние).
+ */
+
 Machine::Machine() : currentRule(1) {}
 
-void Machine::parseConditionalRule(int ruleNumber, Rule::Ruls action,
-                                   std::istringstream& ss, const std::string& line) {
-    int condition, nextIfZero, nextIfOne;
+/**
+ * @brief Разбор строки с правилом.
+ * @details
+ * Разделяет строку с текстовым описанием правила и создает объект `Rule`.
+ *
+ * @param line Строка, содержащая данные одного правила.
+ */
 
-    if (!(ss >> condition >> nextIfZero >> nextIfOne)) {
-        std::cerr << " Ошибка: некорректный формат условного правила:\n"
-                  << "   " << line << "\n";
-        return;
-    }
-
-    rules[ruleNumber] = Rule(ruleNumber, action, condition, nextIfZero, nextIfOne);
-}
-
-void Machine::parseRuleLine(const std::string& line) {
+void Machine::ParseRuleLine(const std::string& line) {
     std::istringstream ss(line);
 
     int ruleNumber, actionInt;
@@ -35,13 +64,22 @@ void Machine::parseRuleLine(const std::string& line) {
     Rule::Ruls action = static_cast<Rule::Ruls>(actionInt);
 
     if (action == Rule::moveIf)
-        parseConditionalRule(ruleNumber, action, ss, line);
+        ParseConditionalRule(ruleNumber, action, ss, line);
     else
-        parseSimpleRule(ruleNumber, action, ss, line);
+        ParseSimpleRule(ruleNumber, action, ss);
 }
 
-void Machine::parseSimpleRule(int ruleNumber, Rule::Ruls action,
-                              std::istringstream& ss, const std::string& line) {
+/**
+ * @brief Разбиение строки на парметры не условного правила.
+ * @details
+ * Создаёт объект `Rule` без условия и добавляет его в коллекцию `rules`.
+ * @param ruleNumber - параметр номера правила.
+ * @param action - параметр дейтсвия правила
+ * @param ss - поток с оставшимися параметрами строки.
+ */
+
+void Machine::ParseSimpleRule(int ruleNumber, Rule::Ruls action,
+                              std::istringstream& ss) {
     int nextRule;
 
     if (!(ss >> nextRule)) {
@@ -54,27 +92,72 @@ void Machine::parseSimpleRule(int ruleNumber, Rule::Ruls action,
     rules[ruleNumber] = Rule(ruleNumber, action, nextRule);
 }
 
-void Machine::LoadProgram(std::istream& in) {
+/**
+ * @brief Разбиение строки на парметры условного правила.
+ * @details
+ * Создает условное правило с проверкой символа и двумя переходами:
+ * - `nextIfZero` — если символ равен 0;
+ * - `nextIfOne` — иначе.
+ * @param ruleNumber - параметр номера правила.
+ * @param action - параметр дейтсвия правила
+ * @param ss - поток с параметрами условия.
+ * @param line - исходная строка.
+ */
+
+void Machine::ParseConditionalRule(int ruleNumber, Rule::Ruls action,
+                                   std::istringstream& ss, const std::string& line) {
+    int condition, nextIfZero, nextIfOne;
+
+    if (!(ss >> condition >> nextIfZero >> nextIfOne)) {
+        std::cerr << " Ошибка: некорректный формат условного правила:\n"
+                  << "   " << line << "\n";
+        return;
+    }
+
+    rules[ruleNumber] = Rule(ruleNumber, action, condition, nextIfZero, nextIfOne);
+}
+
+/**
+ * @brief Загрузка программы из входного потока.
+ * @details
+ * Метод построчно читает правила до тех пор, пока не встретит строку,
+ * состоящую только из `0` и `1` — она считается инициализацией ленты.
+ * @param input - параметр входной потока с программой и лентой.
+ */
+
+void Machine::LoadProgram(std::istream& input) {
     rules.clear();
     std::string line;
 
-    while (std::getline(in, line)) {
+    while (std::getline(input, line)) {
         if (line.empty()) continue;
         if (line.find_first_not_of("01") == std::string::npos) {
             std::istringstream tapeStream(line);
             tapeStream >> tape;
             break;
         }
-        parseRuleLine(line);
+        ParseRuleLine(line);
     }
 
-    in.clear();
+    input.clear();
     std::cout << "Программа успешно загружена (" << rules.size() << " правил).\n";
 }
 
-void Machine::LoadTape(std::istream& in) {
-    in >> tape;
+/**
+ * @brief Инициализация ленты.
+ * @param input - поток с описанием начального состояния ленты.
+ */
+
+void Machine::LoadTape(std::istream& input) {
+    input >> tape;
 }
+
+/**
+ * @brief Ввод ленты из консоли.
+ * @details
+ * Пользователь вводит строку из `0` и `1`.
+ * Если строка пустая — создается лента со значением по умолчанию `00000`.
+ */
 
 void Machine::InputTapeFromConsole() {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -95,6 +178,12 @@ void Machine::InputTapeFromConsole() {
     cout << "Лента успешно загружена: " << tapeStr << "\n";
 }
 
+/**
+ * @brief Ввод последовательности правил из консоли.
+ * @details
+ * Пользователь вводит строки с номерами, действиями и переходами.
+ * Пустая строка завершает ввод.
+ */
 
 void Machine::InputProgramFromConsole() {
     rules.clear();
@@ -131,13 +220,31 @@ void Machine::InputProgramFromConsole() {
     cout << "\nПрограмма успешно загружена (" << rules.size() << " правил).\n";
 }
 
+/**
+ * @brief Геттер номера текущего правила.
+ * @return Номер текущего правила (`currentRule`).
+ */
+
 int Machine::GetCurrentRule() const {
     return currentRule;
 }
 
+/**
+ * @brief Добавление правила.
+ * @param rule - объект правила для добавления.
+ */
+
 void Machine::AddRule(const Rule& rule) {
     rules[rule.GetRuleNumber()] = rule;
 }
+
+/**
+ * @brief Удаление правила по номеру.
+ * @details
+ * Перед удалением метод проверяет, не ссылаются ли другие правила на указанное.
+ * В случае ссылки выводится предупреждение.
+ * @param ruleNumber - параметр номера правила, которое будет удалено.
+ */
 
 void Machine::RemoveRule(int ruleNumber) {
     auto it = rules.find(ruleNumber);
@@ -155,11 +262,22 @@ void Machine::RemoveRule(int ruleNumber) {
     }
 }
 
+/**
+ * @brief Просмотр текущего списка правил.
+ */
+
 void Machine::ShowRules() {
     for (auto& [num, rule] : rules) {
         rule.Show();
     }
 }
+
+/**
+ * @brief Совершение машиной шага программы.
+ * @details
+ * Выполняет действие текущего правила и переходит к следующему.
+ * Если правило отсутствует — программа завершается.
+ */
 
 void Machine::Step() {
     if (currentRule == -1) return;
@@ -213,21 +331,41 @@ void Machine::Step() {
     }
 }
 
-void Machine::Run() {
+/**
+ * @brief Запуск программы.
+ * @details
+ * Выполняет последовательные шаги машины до достижения конца (`END` или отсутствия правила).
+ * @param log - параметр, который регулирует вывод с деталями о каждом шаге/их отсутствии.
+ */
+void Machine::Run(bool log) {
     if (currentRule == -1)
         currentRule = 1;
     while (currentRule != -1) {
         Step();
         if (currentRule == -1) break;
-        ShowState();
+        if (log) {
+            ShowState();
+        }
     }
 }
+
+/**
+ * @brief Отображение текущего состояния машины.
+ * @details
+ * Выводит номер активного правила и текущее состояние ленты.
+ */
 
 void Machine::ShowState() {
     cout << "---------------------------------\n";
     cout << " Current rule: " << currentRule << endl;
     tape.ShowTape();
 }
+
+/**
+ * @brief Редактор значений на ленте.
+ * @param pos - параметр позиции, на которой произойдёт изменение.
+ * @param val - параметр значение, на которое будет изменено исходное.
+ */
 
 void Machine::GetTapeToModify(int pos, char val) {
     tape.ModifyTape(pos, val);

@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
         machine.LoadTape(fin);
 
         cout << "Программа загружена из " << filename << ".\n";
-        machine.Run();
+        machine.Run(logging);
 
         return 0;
     }
@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
                 machine.ShowState();
                 break;
             case 5:
-                machine.Run();
+                machine.Run(true);
                 break;
             case 0:
                 running = false;
