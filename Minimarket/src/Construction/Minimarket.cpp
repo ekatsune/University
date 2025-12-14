@@ -22,7 +22,7 @@ void Minimarket::HireEmployee() {
             empl_name,
             surname,
             id,
-            sex == 0 ? Employee::male : Employee::female
+            sex == 0 ? Employee::SexType::male : Employee::SexType::female
     );
     staff.AddEmployee(employee);
     std::cout << "Сотрудник нанят!\n";
@@ -36,11 +36,11 @@ void Minimarket::FireEmployee() {
     std::cout << "Сотрудник уволен.\n";
 }
 
-void Minimarket::SetStatus(Minimarket::store_status store_status) {
-    this->current_status=store_status;
+void Minimarket::SetStatus(Minimarket::StoreStatus StoreStatus) {
+    this->current_status=StoreStatus;
 }
 
-Minimarket::store_status Minimarket::GetStatus(){return current_status;}
+Minimarket::StoreStatus Minimarket::GetStatus(){return current_status;}
 
 StaffDatabase& Minimarket::GetStaffDatabase() { return staff; }
 

@@ -25,7 +25,7 @@ public:
     WarehouseWorker(const std::string& name,
                     const std::string& surname,
                     const std::string& ID,
-                    Employee::sex_type sex)
+                    Employee::SexType sex)
             : Employee(name, surname, ID, sex) {}
 
     /**
@@ -81,7 +81,5 @@ public:
      * @brief Установить склад для работы
      * @param warehouse Указатель на склад
      */
-    void SetWorkPlace(Warehouse* warehouse) {
-        work_place = warehouse;
-    }
+    void SetWorkPlace(Warehouse* warehouse);
 };

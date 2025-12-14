@@ -18,8 +18,7 @@ private:
 
 public:
     /**
-     * @brief Конструктор по умолчанию
-     *
+     * @brief Конструктор по умолчанию.
      * Инициализирует кассу с нулевой суммой и закрытой сменой.
      */
     CashRegister() : cash_inside(0,0), is_open(false), cashier_id("") {}

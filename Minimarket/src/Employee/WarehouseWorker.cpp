@@ -114,3 +114,7 @@ void WarehouseWorker::ReplenishmentOfShelvesInMinimarket(Shelf& shelf,
 std::vector<Product> WarehouseWorker::GetWarehouseState() const {
     return work_place->GetProducts().GetAllProducts();
 }
+
+void WarehouseWorker::SetWorkPlace(Warehouse* warehouse) {
+    work_place = warehouse;
+}

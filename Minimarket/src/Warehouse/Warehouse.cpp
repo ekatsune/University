@@ -17,7 +17,7 @@ ProductsInWarehouse& Warehouse::GetProducts() {
     return list_of_products_in_warehouse;
 }
 
-void Warehouse::SetStatus(warehouse_status new_status) {
+void Warehouse::SetStatus(WarehouseStatus new_status) {
     status = new_status;
 }
 

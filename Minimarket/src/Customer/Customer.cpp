@@ -51,7 +51,7 @@ void Customer::Payment() {
     cart.Clear();
 }
 
-Customer::category_age Customer::GetAge() const {
+Customer::CategoryAge Customer::GetAge() const {
     return age;
 }
 

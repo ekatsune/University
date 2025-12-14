@@ -52,13 +52,13 @@ void TradingFloor::ShowCustomers() const {
     for (const auto* c : customers) {
         std::cout << "  Покупатель, возрастная категория: ";
         switch (c->GetAge()) {
-            case Customer::category_age::up_to_15:
+            case Customer::CategoryAge::up_to_15:
                 std::cout << "до 15\n";
                 break;
-            case Customer::category_age::after_15_up_to_18:
+            case Customer::CategoryAge::after_15_up_to_18:
                 std::cout << "15-18\n";
                 break;
-            case Customer::category_age::after_18:
+            case Customer::CategoryAge::after_18:
                 std::cout << "18+\n";
                 break;
         }

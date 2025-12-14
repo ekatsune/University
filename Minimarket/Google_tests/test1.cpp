@@ -761,7 +761,7 @@ TEST(TradingFloorTest, AddRemoveShkafAndCustomer) {
     tf.AddShkaf(shk);
     EXPECT_EQ(tf.GetShkafs().size(), 1);
 
-    Customer* c1 = new Customer(100, Customer::category_age::after_18);
+    Customer* c1 = new Customer(100, Customer::CategoryAge::after_18);
     tf.AddCustomer(c1);
     EXPECT_EQ(tf.GetShkafs().size(), 1);
 
@@ -820,9 +820,9 @@ TEST(TradingFloorTest, FindProductReturnsNullptrWhenMissing) {
 
 TEST(TradingFloorTest, MultipleCustomersAndShowCustomers) {
     TradingFloor tf;
-    Customer* c1 = new Customer(10, Customer::category_age::up_to_15);
-    Customer* c2 = new Customer(16, Customer::category_age::after_15_up_to_18);
-    Customer* c3 = new Customer(25, Customer::category_age::after_18);
+    Customer* c1 = new Customer(10, Customer::CategoryAge::up_to_15);
+    Customer* c2 = new Customer(16, Customer::CategoryAge::after_15_up_to_18);
+    Customer* c3 = new Customer(25, Customer::CategoryAge::after_18);
 
     tf.AddCustomer(c1);
     tf.AddCustomer(c2);
@@ -845,7 +845,7 @@ TEST(TradingFloorTest, ShowAllShelvesAndShowCustomersOutputs) {
     shk->AddShelf(shelf);
     tf.AddShkaf(shk);
 
-    Customer* c = new Customer(20, Customer::category_age::after_18);
+    Customer* c = new Customer(20, Customer::CategoryAge::after_18);
     tf.AddCustomer(c);
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
@@ -882,14 +882,14 @@ TEST(MinimarketTest, HireEmployeeTest) {
     ASSERT_NE(emp, nullptr);
     EXPECT_EQ(emp->GetName(), "John");
     EXPECT_EQ(emp->GetSurname(), "Doe");
-    EXPECT_EQ(emp->GetSex(), Employee::male);
+    EXPECT_EQ(emp->GetSex(), Employee::SexType::male);
     std::cin.rdbuf(cin_backup);
     std::cout.rdbuf(cout_backup);
 }
 
 TEST(MinimarketTest, FireEmployeeTest) {
     Minimarket market("Kopeechka", "Semashko_90_A");
-    market.GetStaffDatabase().AddEmployee(new Employee("John", "Doe", "123", Employee::male));
+    market.GetStaffDatabase().AddEmployee(new Employee("John", "Doe", "123", Employee::SexType::male));
     auto* emp_before = market.GetStaffDatabase().FindEmployeeByID("123");
     ASSERT_NE(emp_before, nullptr);
     std::istringstream input("123\n");
@@ -914,24 +914,24 @@ TEST(MinimarketTest, FireEmployeeTest) {
 
 TEST(MinimarketTest, StatusAndTradingFloor) {
     Minimarket m("MiniMart", "Main Street");
-    EXPECT_NE(m.GetStatus(), Minimarket::OPEN);
+    EXPECT_NE(m.GetStatus(), Minimarket::StoreStatus::OPEN);
 }
 
 TEST(MinimarketTest, DefaultStatusIsClose) {
     Minimarket market("MyMarket", "Some address");
-    EXPECT_EQ(market.GetStatus(), Minimarket::CLOSE);
+    EXPECT_EQ(market.GetStatus(), Minimarket::StoreStatus::CLOSE);
 }
 
 TEST(MinimarketTest, SetAndGetStatus) {
     Minimarket market("MyMarket", "Some address");
-    market.SetStatus(Minimarket::OPEN);
-    EXPECT_EQ(market.GetStatus(), Minimarket::OPEN);
+    market.SetStatus(Minimarket::StoreStatus::OPEN);
+    EXPECT_EQ(market.GetStatus(), Minimarket::StoreStatus::OPEN);
 
-    market.SetStatus(Minimarket::LUNCH_BREAK);
-    EXPECT_EQ(market.GetStatus(), Minimarket::LUNCH_BREAK);
+    market.SetStatus(Minimarket::StoreStatus::LUNCH_BREAK);
+    EXPECT_EQ(market.GetStatus(), Minimarket::StoreStatus::LUNCH_BREAK);
 
-    market.SetStatus(Minimarket::SANITARY_DAY);
-    EXPECT_EQ(market.GetStatus(), Minimarket::SANITARY_DAY);
+    market.SetStatus(Minimarket::StoreStatus::SANITARY_DAY);
+    EXPECT_EQ(market.GetStatus(), Minimarket::StoreStatus::SANITARY_DAY);
 }
 
 TEST(MinimarketTest, ShowTradingFloorDoesNotThrow) {
@@ -942,7 +942,7 @@ TEST(MinimarketTest, ShowTradingFloorDoesNotThrow) {
 TEST(MinimarketTest, AddAndRemoveEmployeeViaStaffDatabase) {
     Minimarket market("MyMarket", "Some address");
 
-    auto* emp = new Employee("John", "Doe", "1", Employee::male);
+    auto* emp = new Employee("John", "Doe", "1", Employee::SexType::male);
     market.GetStaffDatabase().AddEmployee(emp);
 
     EXPECT_EQ(market.GetStaffDatabase().GetEmployeeCount(), 1);
@@ -994,7 +994,7 @@ TEST(CartTest, ClearCart) {
 /////////////////////////////////////////////////////////////////////////////////////
 
 TEST(CustomerTest, AddAndRemoveProductInCart) {
-    Customer c(100, Customer::category_age::after_18);
+    Customer c(100, Customer::CategoryAge::after_18);
     auto* p1 = new Product("Cheese", BYN(200));
     auto* p2 = new Product("Butter", BYN(150));
 
@@ -1017,7 +1017,7 @@ TEST(CustomerTest, AddAndRemoveProductInCart) {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 TEST(CashierTest, AskPaymentMethodCard) {
-    Cashier cashier("John","Doe","1", Employee::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
 
     std::istringstream input("1\n1234567890123456\nJohn Doe\n01 12 2025\n");
     std::streambuf* cin_backup = std::cin.rdbuf();
@@ -1042,7 +1042,7 @@ TEST(CashierTest, AskPaymentMethodCard) {
 }
 
 TEST(CashierTest, CustomerServiceCashPayment) {
-    Cashier cashier("John", "Doe", "1", Employee::male);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
 
     Cart cart;
     Product* p = new Product("Milk", BYN(100));
@@ -1074,7 +1074,7 @@ TEST(CashierTest, CustomerServiceCashPayment) {
 TEST(CashierTest, CashReport_WithReceipts)
 {
 
-    Cashier cashier("Ivan", "Petrov", "10", Employee::male);
+    Cashier cashier("Ivan", "Petrov", "10", Employee::SexType::male);
     cashier.OpenShift();
     Cart cart1;
     cart1.AddItem(new Product("Milk", BYN(100,0)));
@@ -1095,7 +1095,7 @@ TEST(CashierTest, CashReport_WithReceipts)
 }
 
 TEST(CashierTest, CancellationOfProduct) {
-    Cashier cashier("Alice", "Smith", "2", Employee::female);
+    Cashier cashier("Alice", "Smith", "2", Employee::SexType::female);
     Receipt r(1, Date(1,1,2024));
     Product* p1 = new Product("Milk", BYN(50));
     Product* p2 = new Product("Bread", BYN(30));
@@ -1129,7 +1129,7 @@ TEST(CashierTest, CancellationOfProduct) {
 }
 
 TEST(CashierTest, OpenShiftTest) {
-    Cashier cashier("Mark", "Lee", "5", Employee::male);
+    Cashier cashier("Mark", "Lee", "5", Employee::SexType::male);
 
     std::ostringstream output;
     auto* cout_backup = std::cout.rdbuf();
@@ -1146,7 +1146,7 @@ TEST(CashierTest, OpenShiftTest) {
 
 
 TEST(CashierTest, AskPaymentMethodCash) {
-    Cashier cashier("John","Doe","1", Employee::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
 
     std::istringstream input("2\n200\n");
     std::streambuf* cin_backup = std::cin.rdbuf();
@@ -1171,14 +1171,14 @@ TEST(CashierTest, AskPaymentMethodCash) {
 }
 
 TEST(CashierTest, CreationAndCashReport) {
-    Cashier cashier("John","Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John","Doe", "1", Employee::SexType::male);
     std::string report_text = cashier.CashReportText();
     EXPECT_FALSE(report_text.empty());
     EXPECT_NO_THROW(cashier.CashReport());
 }
 
 TEST(CashierTest, CreatingReceiptAndCustomerService) {
-    Cashier cashier("John","Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John","Doe", "1", Employee::SexType::male);
     Cart cart;
 
     auto* p1 = new Product("Milk", BYN(100));
@@ -1195,7 +1195,7 @@ TEST(CashierTest, CreatingReceiptAndCustomerService) {
 }
 
 TEST(CashierTest, PaymentMethods) {
-    Cashier cashier("John","Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John","Doe", "1", Employee::SexType::male);
     BYN total = 100;
     cashier.OpenShift();
     CashPayment cash_method(total);
@@ -1206,7 +1206,7 @@ TEST(CashierTest, PaymentMethods) {
 }
 
 TEST(CashierTest, ProcessPaymentAndCancellation) {
-    Cashier cashier("John","Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John","Doe", "1", Employee::SexType::male);
     cashier.OpenShift();
     Cart cart;
     auto* p1 = new Product("Milk", BYN(100));
@@ -1221,7 +1221,7 @@ TEST(CashierTest, ProcessPaymentAndCancellation) {
 }
 
 TEST(CashierTest, ProcessPaymentWithUnknownMethod) {
-    Cashier cashier("John","Doe","1", Employee::sex_type::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
     cashier.OpenShift();
 
     Cart cart;
@@ -1241,7 +1241,7 @@ TEST(CashierTest, ProcessPaymentWithUnknownMethod) {
 }
 
 TEST(CashierTest, CashPaymentMethodNotEnoughCash) {
-    Cashier cashier("John","Doe","1", Employee::sex_type::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
     cashier.OpenShift();
 
     BYN total(100);
@@ -1252,7 +1252,7 @@ TEST(CashierTest, CashPaymentMethodNotEnoughCash) {
 }
 
 TEST(CashierTest, CardPaymentMethodExpiredCard) {
-    Cashier cashier("John","Doe","1", Employee::sex_type::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
     cashier.OpenShift();
 
     BYN total(100);
@@ -1265,7 +1265,7 @@ TEST(CashierTest, CardPaymentMethodExpiredCard) {
 }
 
 TEST(CashierTest, CancellationOfProductNonExisting) {
-    Cashier cashier("John","Doe","1", Employee::sex_type::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
     cashier.OpenShift();
 
     Cart cart;
@@ -1280,14 +1280,14 @@ TEST(CashierTest, CancellationOfProductNonExisting) {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 TEST(CashierTest, ConstructorAndCashReport) {
-    Cashier cashier("John", "Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
     std::string report = cashier.CashReportText();
     EXPECT_FALSE(report.empty());
     EXPECT_NO_THROW(cashier.CashReport());
 }
 
 TEST(CashierTest, CreatingReceipt) {
-    Cashier cashier("John", "Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
     Cart cart;
     cashier.OpenShift();
     auto* p = new Product("Milk", BYN(100));
@@ -1300,7 +1300,7 @@ TEST(CashierTest, CreatingReceipt) {
 }
 
 TEST(CashierTest, CashAndCardPaymentMethods) {
-    Cashier cashier("John", "Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
     BYN total(100);
     cashier.OpenShift();
     CashPayment cash(total + 50);
@@ -1311,7 +1311,7 @@ TEST(CashierTest, CashAndCardPaymentMethods) {
 }
 
 TEST(CashierTest, ProcessPayment) {
-    Cashier cashier("John", "Doe", "1", Employee::sex_type::male);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
     Cart cart;
     cashier.OpenShift();
     auto* p = new Product("Milk", BYN(100));
@@ -1328,12 +1328,12 @@ TEST(CashierTest, ProcessPayment) {
 }
 
 TEST(CustomerTest, ConstructorAndGetAge) {
-    Customer c(25, Customer::category_age::after_18);
-    EXPECT_EQ(c.GetAge(), Customer::category_age::after_18);
+    Customer c(25, Customer::CategoryAge::after_18);
+    EXPECT_EQ(c.GetAge(), Customer::CategoryAge::after_18);
 }
 
 TEST(CustomerTest, AddProductToCart) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     Product* p = new Product("Milk", BYN(100));
 
     c.AddProductToCart(p);
@@ -1344,13 +1344,13 @@ TEST(CustomerTest, AddProductToCart) {
 }
 
 TEST(CustomerTest, AddNullProductToCart) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     EXPECT_NO_THROW(c.AddProductToCart(nullptr));
     EXPECT_TRUE(c.GetCart().GetItems().empty());
 }
 
 TEST(CustomerTest, RemoveProductFromCart) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     Product* p = new Product("Bread", BYN(50));
     c.AddProductToCart(p);
 
@@ -1361,12 +1361,12 @@ TEST(CustomerTest, RemoveProductFromCart) {
 }
 
 TEST(CustomerTest, RemoveNonexistentProduct) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     EXPECT_NO_THROW(c.RemoveProductFromCart("Nonexistent"));
 }
 
 TEST(CustomerTest, ShowCartWithProducts) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     Product* p = new Product("Cheese", BYN(200));
     c.AddProductToCart(p);
 
@@ -1380,7 +1380,7 @@ TEST(CustomerTest, ShowCartWithProducts) {
 }
 
 TEST(CustomerTest, ShowEmptyCart) {
-    Customer c(20, Customer::category_age::after_18);
+    Customer c(20, Customer::CategoryAge::after_18);
     std::stringstream buffer;
     std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
     c.ShowCart();
@@ -1391,8 +1391,8 @@ TEST(CustomerTest, ShowEmptyCart) {
 
 
 TEST(CustomerTest, PaymentWithEmptyCart) {
-    Customer c(20, Customer::category_age::after_18);
-    Cashier cashier("John", "Doe", "1", Employee::sex_type::male);
+    Customer c(20, Customer::CategoryAge::after_18);
+    Cashier cashier("John", "Doe", "1", Employee::SexType::male);
     c.SetCashier(&cashier);
 
     std::stringstream buffer;
@@ -1461,7 +1461,7 @@ TEST(CleaningScheduleTest, OverwriteTask) {
 }
 
 TEST(CleanerTest, GarbageRemoval) {
-    Cleaner cleaner("John", "Doe", "1", Employee::sex_type::male);
+    Cleaner cleaner("John", "Doe", "1", Employee::SexType::male);
 
     cleaner.GarbageRemoval();
     cleaner.GarbageRemoval();
@@ -1469,7 +1469,7 @@ TEST(CleanerTest, GarbageRemoval) {
 }
 
 TEST(CleanerTest, CleaningTasks) {
-    Cleaner cleaner("John", "Doe", "1", Employee::sex_type::male);
+    Cleaner cleaner("John", "Doe", "1", Employee::SexType::male);
 
     CleaningSchedule& schedule = cleaner.GetCleaningSchedule();
     schedule.SetTask(WorkSchedule::Day::Monday, CleaningSchedule::CleaningType::Wet);
@@ -1486,7 +1486,7 @@ TEST(CleanerTest, CleaningTasks) {
 }
 
 TEST(CleanerTest, GetCleaningSchedule) {
-    Cleaner cleaner("Jane", "Smith", "2", Employee::sex_type::female);
+    Cleaner cleaner("Jane", "Smith", "2", Employee::SexType::female);
     CleaningSchedule& schedule = cleaner.GetCleaningSchedule();
     schedule.SetTask(WorkSchedule::Day::Monday, CleaningSchedule::CleaningType::Dry);
     EXPECT_EQ(schedule.GetTask(WorkSchedule::Day::Monday), CleaningSchedule::CleaningType::Dry);
@@ -1522,7 +1522,7 @@ TEST(ContactInformationTest, SettersAndGetters) {
 
 TEST(DirectorTest, CreatePurchaseOrder_Success)
 {
-    Director director("Ivan", "Petrov", "D1", Employee::male);
+    Director director("Ivan", "Petrov", "D1", Employee::SexType::male);
     director.AddToShoppingList(Product("Milk", BYN(100,0)),50);
     director.AddToShoppingList(Product("Bread", BYN(150,0)),30);
 
@@ -1540,7 +1540,7 @@ TEST(DirectorTest, CreatePurchaseOrder_Success)
 
 TEST(DirectorTest, CreatePurchaseOrder_UnauthorizedProvider)
 {
-    Director director("Ivan", "Petrov", "D1", Employee::male);
+    Director director("Ivan", "Petrov", "D1", Employee::SexType::male);
 
     Provider provider("EvilCorp", "000", "bad@mail.com");
     director.AddToShoppingList(Product("Milk", BYN(100,0)),30);
@@ -1552,7 +1552,7 @@ TEST(DirectorTest, CreatePurchaseOrder_UnauthorizedProvider)
 
 TEST(DirectorTest, CreatePurchaseOrder_EmptyShoppingList)
 {
-    Director director("Ivan", "Petrov", "D1", Employee::male);
+    Director director("Ivan", "Petrov", "D1", Employee::SexType::male);
 
     Provider provider("GoodCorp", "111", "ok@mail.com");
     director.AddAllowedProvider(&provider);
@@ -1568,7 +1568,7 @@ TEST(DirectorTest, CreatePurchaseOrder_EmptyShoppingList)
 
 TEST(DirectorTest, SendOrderToProvider_Success)
 {
-    Director director("Ivan", "Petrov", "D1", Employee::male);
+    Director director("Ivan", "Petrov", "D1", Employee::SexType::male);
 
     Provider provider("FoodCorp", "222", "food@mail.com");
     director.AddAllowedProvider(&provider);
@@ -1588,7 +1588,7 @@ TEST(DirectorTest, SendOrderToProvider_Success)
 
 TEST(DirectorTest, SendOrderToProvider_InvalidSupplier)
 {
-    Director director("Ivan", "Petrov", "D1", Employee::male);
+    Director director("Ivan", "Petrov", "D1", Employee::SexType::male);
     std::vector<Product> goods = { Product("Sugar", BYN(50)) };
     PurchaseOrder bad_order(nullptr, goods, "MainWarehouse");
 
@@ -1598,7 +1598,7 @@ TEST(DirectorTest, SendOrderToProvider_InvalidSupplier)
 }
 
 TEST(DirectorTest, ShoppingListManagement) {
-    Director director("John","Doe", "1", Employee::sex_type::male);
+    Director director("John","Doe", "1", Employee::SexType::male);
 
     Product p1("Milk", BYN(100));
     Product p2("Bread", BYN(50));
@@ -1608,7 +1608,7 @@ TEST(DirectorTest, ShoppingListManagement) {
 }
 
 TEST(DirectorTest, AnalyzeWarehouseAndPrepareOrder) {
-    Director director("John","Doe", "1", Employee::sex_type::male);
+    Director director("John","Doe", "1", Employee::SexType::male);
 
     std::vector<Product> warehouse = {
             Product("Milk", BYN(10)),
@@ -1619,7 +1619,7 @@ TEST(DirectorTest, AnalyzeWarehouseAndPrepareOrder) {
 }
 
 TEST(DirectorTest, AllowedProviders) {
-    Director director("John","Doe", "1", Employee::sex_type::male);
+    Director director("John","Doe", "1", Employee::SexType::male);
     Provider provider1("Bob","+375293875944", "dhfd@dfvdjv.com"), provider2("Alex","+74583428254", "kdjvnsfkjg@fnvd.com");
     director.AddAllowedProvider(&provider1);
 
@@ -1628,17 +1628,17 @@ TEST(DirectorTest, AllowedProviders) {
 }
 
 TEST(DirectorTest, DrawingUpStaffWorkSchedule) {
-    Director director("John","Doe", "1", Employee::sex_type::male);
+    Director director("John","Doe", "1", Employee::SexType::male);
     EXPECT_NO_THROW(director.DrawingUpStaffWorkSchedule());
 }
 
 TEST(DirectorTest, CheckReadinessForWork) {
-    Director director("John","Doe", "1", Employee::sex_type::male);
+    Director director("John","Doe", "1", Employee::SexType::male);
     EXPECT_NO_THROW(director.CheckReadinessForWork());
 }
 
 TEST(DirectorTest, ProductExpirationDateControl) {
-    Director director("John", "Doe", "1", Employee::sex_type::male);
+    Director director("John", "Doe", "1", Employee::SexType::male);
 
     auto *shkaf = new Shkaf();
     auto *shelf = new Shelf();
@@ -1662,8 +1662,8 @@ TEST(DirectorTest, ProductExpirationDateControl) {
 TEST(StaffDatabaseTest, AddAndGetEmployees) {
     StaffDatabase db;
 
-    Cashier* e1 = new Cashier("John", "Doe", "1", Employee::sex_type::male);
-    Cashier* e2 = new Cashier("Jane", "Smith", "2", Employee::sex_type::female);
+    Cashier* e1 = new Cashier("John", "Doe", "1", Employee::SexType::male);
+    Cashier* e2 = new Cashier("Jane", "Smith", "2", Employee::SexType::female);
 
     db.AddEmployee(e1);
     db.AddEmployee(e2);
@@ -1680,8 +1680,8 @@ TEST(StaffDatabaseTest, AddAndGetEmployees) {
 TEST(StaffDatabaseTest, RemoveEmployee) {
     StaffDatabase db;
 
-    Cashier* e1 = new Cashier("John", "Doe", "1", Employee::sex_type::male);
-    Cashier* e2 = new Cashier("Jane", "Smith", "2", Employee::sex_type::female);
+    Cashier* e1 = new Cashier("John", "Doe", "1", Employee::SexType::male);
+    Cashier* e2 = new Cashier("Jane", "Smith", "2", Employee::SexType::female);
 
     db.AddEmployee(e1);
     db.AddEmployee(e2);
@@ -1703,7 +1703,7 @@ TEST(StaffDatabaseTest, RemoveEmployee) {
 TEST(WarehouseWorkerTest, ProductRegistration_CorrectFile_AddsProduct)
 {
     Warehouse warehouse;
-    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::male);
+    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::SexType::male);
     worker.SetWorkPlace(&warehouse);
 
     std::string filename = "test_product.txt";
@@ -1732,7 +1732,7 @@ TEST(WarehouseWorkerTest, ProductRegistration_CorrectFile_AddsProduct)
 TEST(WarehouseWorkerTest, ProductRegistration_InvalidNumbers_NoProductsAdded)
 {
     Warehouse warehouse;
-    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::male);
+    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::SexType::male);
     worker.SetWorkPlace(&warehouse);
 
     std::string filename = "bad_product.txt";
@@ -1760,7 +1760,7 @@ TEST(WarehouseWorkerTest, ProductRegistration_InvalidNumbers_NoProductsAdded)
 TEST(WarehouseWorkerTest, WarehouseBalanceReport_PrintsCorrectData)
 {
     Warehouse warehouse;
-    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::male);
+    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::SexType::male);
     worker.SetWorkPlace(&warehouse);
     warehouse.GetProducts().AddProductToListOfProd(
             Product("Tea", Date(5,1,2025), Date(5,6,2025), BYN(50,0),
@@ -1781,7 +1781,7 @@ TEST(WarehouseWorkerTest, WarehouseBalanceReport_PrintsCorrectData)
 TEST(WarehouseWorkerTest, WarehouseBalanceReport_EmptyWarehouse)
 {
     Warehouse warehouse;
-    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::male);
+    WarehouseWorker worker("Ivan", "Petrov", "W1", Employee::SexType::male);
     worker.SetWorkPlace(&warehouse);
 
     testing::internal::CaptureStdout();
@@ -1792,7 +1792,7 @@ TEST(WarehouseWorkerTest, WarehouseBalanceReport_EmptyWarehouse)
 }
 
 TEST(WarehouseWorkerTest, AcceptTheProductAndWarehouseBalance) {
-    WarehouseWorker worker("John", "Doe", "1", Employee::sex_type::male);
+    WarehouseWorker worker("John", "Doe", "1", Employee::SexType::male);
     Warehouse wh;
 
     worker.SetWorkPlace(&wh);
@@ -1818,7 +1818,7 @@ TEST(WarehouseWorkerTest, AcceptTheProductAndWarehouseBalance) {
 }
 
 TEST(WarehouseWorkerTest, ReplenishmentOfShelves) {
-    WarehouseWorker worker("John", "Doe", "1", Employee::sex_type::male);
+    WarehouseWorker worker("John", "Doe", "1", Employee::SexType::male);
     Warehouse wh;
     worker.SetWorkPlace(&wh);
 
@@ -1932,7 +1932,7 @@ TEST(DocumentationTest, AddDocument) {
 }
 
 TEST(DocumentationTest, CollectCashReport) {
-    Cashier cashier("John","Doe","1", Employee::sex_type::male);
+    Cashier cashier("John","Doe","1", Employee::SexType::male);
 
     Documentation doc;
     EXPECT_NO_THROW(doc.CollectCashReport(cashier));
@@ -1943,7 +1943,7 @@ TEST(DocumentationTest, CollectCashReport) {
 }
 
 TEST(DocumentationTest, CollectWarehouseBalanceReport) {
-    WarehouseWorker worker("Alice","Smith","2", Employee::sex_type::female);
+    WarehouseWorker worker("Alice","Smith","2", Employee::SexType::female);
     Warehouse wh;
     worker.SetWorkPlace(&wh);
     Documentation doc;
@@ -1972,7 +1972,7 @@ TEST(DocumentationTest, PrintDocumentInvalidIndex) {
 }
 
 TEST(DocumentationTest, CollectWarehouseBalanceReportWithProducts) {
-    WarehouseWorker worker("Bob","Brown","3", Employee::sex_type::male);
+    WarehouseWorker worker("Bob","Brown","3", Employee::SexType::male);
     Warehouse wh;
     worker.SetWorkPlace(&wh);
     Product p("Bread", Date(1,1,2025), Date(1,3,2025), BYN(150,0),
@@ -1999,7 +1999,7 @@ TEST(DocumentationTest, AddEmptyDocument) {
 }
 
 TEST(DocumentationTest, MultipleCollectCashReports) {
-    Cashier cashier("Jane","Doe","4", Employee::sex_type::female);
+    Cashier cashier("Jane","Doe","4", Employee::SexType::female);
     Documentation doc;
 
     doc.CollectCashReport(cashier);

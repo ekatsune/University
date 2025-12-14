@@ -31,7 +31,7 @@ public:
     Director(const std::string& name,
              const std::string& surname,
              const std::string& ID,
-             sex_type sex)
+             SexType sex)
             : Employee(name, surname, ID, sex) {}
 
     /**

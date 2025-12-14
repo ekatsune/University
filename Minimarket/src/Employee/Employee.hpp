@@ -13,13 +13,13 @@ public:
     /**
      * @brief Пол сотрудника
      */
-    enum sex_type { male, female };
+    enum class SexType { male, female };
 
 protected:
     const std::string name;        /**< Имя сотрудника */
     const std::string surname;     /**< Фамилия сотрудника */
     const std::string ID;          /**< Идентификатор сотрудника */
-    const sex_type sex;            /**< Пол сотрудника */
+    const SexType sex;            /**< Пол сотрудника */
     WorkSchedule schedule;         /**< График работы сотрудника */
     ContactInformation contact;    /**< Контактная информация сотрудника */
 
@@ -34,7 +34,7 @@ public:
     Employee(const std::string& name,
              const std::string& surname,
              const std::string& ID,
-             sex_type sex);
+             SexType sex);
 
     /**
      * @brief Получить имя сотрудника
@@ -56,7 +56,7 @@ public:
 
     /**
      * @brief Получить пол сотрудника
-     * @return sex_type Пол
+     * @return SexType Пол
      */
-    sex_type GetSex() const;
+    SexType GetSex() const;
 };

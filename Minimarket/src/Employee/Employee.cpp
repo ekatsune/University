@@ -12,7 +12,7 @@
 Employee::Employee(const std::string& name,
                    const std::string& surname,
                    const std::string& ID,
-                   sex_type sex)
+                   SexType sex)
         : name(name), surname(surname), ID(ID), sex(sex)
 {}
 
@@ -22,6 +22,6 @@ std::string Employee::GetName() const {return name;}
 
 std::string Employee::GetSurname() const {return surname;}
 
-Employee::sex_type Employee::GetSex() const {
+Employee::SexType Employee::GetSex() const {
     return sex;
 }

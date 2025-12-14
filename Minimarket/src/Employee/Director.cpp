@@ -70,13 +70,13 @@ ProductsDelivery Director::SendOrderToProvider(PurchaseOrder& order) {
 
 void Director::CheckReadinessForWork() {
     std::cout << "Проверка готовности магазина...\n";
-    Minimarket::store_status status = minimarket->GetStatus();
-    if (status == Minimarket::CLOSE || status == Minimarket::SANITARY_DAY) {
+    Minimarket::StoreStatus status = minimarket->GetStatus();
+    if (status == Minimarket::StoreStatus::CLOSE || status == Minimarket::StoreStatus::SANITARY_DAY) {
         std::cout << "Магазин закрыт. Готовность: НЕТ\n"; return;
     }
-    else if (status == Minimarket::LUNCH_BREAK) {
+    else if (status == Minimarket::StoreStatus::LUNCH_BREAK) {
         std::cout << "Сейчас обеденный перерыв. Магазин частично готов.\n";
-    } else if (status == Minimarket::OPEN) {
+    } else if (status == Minimarket::StoreStatus::OPEN) {
         std::cout << "Магазин открыт.\n";
     }
     const auto& employees = staff.GetEmployees();
@@ -85,7 +85,7 @@ void Director::CheckReadinessForWork() {
     } else {
         std::cout << "Количество сотрудников на смене: " << employees.size() << "\n";
     }
-    if (status == Minimarket::OPEN && !employees.empty() && !shopping_list.empty()) {
+    if (status == Minimarket::StoreStatus::OPEN && !employees.empty() && !shopping_list.empty()) {
         std::cout << "Магазин полностью готов к работе.\n";
     } else {
         std::cout << "Магазин не полностью готов к работе.\n";
@@ -107,7 +107,7 @@ void Director::DrawingUpStaffWorkSchedule() {
 
 void Director::ProductExpirationDateControl() {
     for (size_t i = 0; i < shkafs.size(); ++i) {
-        Shkaf* shkaf = shkafs[i];  // Получаем указатель на шкаф
+        Shkaf* shkaf = shkafs[i];
         if (!shkaf) continue;
 
         int shelfCount = shkaf->GetShelfCount();

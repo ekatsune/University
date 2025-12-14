@@ -15,7 +15,7 @@ public:
     /**
      * @brief Категории возраста покупателя
      */
-    enum class category_age {
+    enum class CategoryAge {
         up_to_15,           /**< До 15 лет */
         after_15_up_to_18,  /**< От 15 до 18 лет */
         after_18            /**< Старше 18 лет */
@@ -24,7 +24,7 @@ public:
 private:
     BYN wallet;               /**< Деньги покупателя */
     Cart cart;                /**< Корзина покупателя */
-    category_age age;         /**< Возрастная категория */
+    CategoryAge age;         /**< Возрастная категория */
     Cashier* cashier;         /**< Кассир, обслуживающий покупателя */
 
 public:
@@ -33,7 +33,7 @@ public:
      * @param wallet Сумма денег у покупателя
      * @param age Возрастная категория покупателя
      */
-    Customer(BYN wallet, category_age age)
+    Customer(BYN wallet, CategoryAge age)
             : wallet(wallet), age(age) {};
 
     /**
@@ -68,7 +68,7 @@ public:
      * @brief Получить возрастную категорию покупателя
      * @return category_age Категория возраста
      */
-    category_age GetAge() const;
+    CategoryAge GetAge() const;
 
     /**
      * @brief Назначить кассира, который обслуживает покупателя

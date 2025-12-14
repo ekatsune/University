@@ -11,7 +11,7 @@
 class Warehouse {
 public:
     /** @brief Статус работы склада */
-    enum warehouse_status {
+    enum class WarehouseStatus {
         OPEN,                   /**< Склад открыт */
         CLOSE,                  /**< Склад закрыт */
         LUNCH_BREAK,            /**< Перерыв на обед */
@@ -22,7 +22,7 @@ private:
     int square;                                /**< Площадь склада */
     const std::string address;                 /**< Адрес склада */
     ProductsInWarehouse list_of_products_in_warehouse; /**< Продукты на складе */
-    warehouse_status status;                   /**< Текущий статус работы склада */
+    WarehouseStatus status;                   /**< Текущий статус работы склада */
 
 public:
     /** @brief Конструктор по умолчанию */
@@ -32,7 +32,7 @@ public:
      * @brief Установить статус работы склада
      * @param new_status Новый статус
      */
-    void SetStatus(warehouse_status new_status);
+    void SetStatus(WarehouseStatus new_status);
 
     /**
      * @brief Добавить продукт на склад

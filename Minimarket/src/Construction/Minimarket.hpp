@@ -18,7 +18,7 @@ public:
     /**
      * @brief Статус магазина
      */
-    enum store_status {
+    enum class StoreStatus {
         OPEN,          /**< Магазин открыт */
         CLOSE,         /**< Магазин закрыт */
         LUNCH_BREAK,   /**< Перерыв на обед */
@@ -29,7 +29,7 @@ private:
     const std::string name;         /**< Название магазина */
     const std::string address;      /**< Адрес магазина */
     StaffDatabase staff;            /**< База сотрудников */
-    store_status current_status = CLOSE; /**< Текущий статус магазина */
+    StoreStatus current_status = StoreStatus::CLOSE; /**< Текущий статус магазина */
 
 public:
     /**
@@ -55,7 +55,7 @@ public:
      * @brief Получить текущий статус магазина
      * @return store_status Текущий статус
      */
-    store_status GetStatus();
+    StoreStatus GetStatus();
 
     /**
      * @brief Получить базу данных сотрудников
@@ -67,7 +67,7 @@ public:
      * @brief Установить текущий статус магазина
      * @param store_status Новый статус
      */
-    void SetStatus(Minimarket::store_status store_status);
+    void SetStatus(Minimarket::StoreStatus store_status);
 
     /**
      * @brief Показать торговый зал
